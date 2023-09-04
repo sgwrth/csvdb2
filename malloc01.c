@@ -249,38 +249,59 @@ void readFemcharsFromFile(Femchar **anf)
 {
 	FILE *fp = fopen(getFilename(), "r");
 	char ch;
-
-	// start: reading line from csv
-
 	char arrayFromChars[BUFSIZ];
 	int i = 0;
-	while ((ch = fgetc(fp)) != EOF && ch != '\n') {
+	while ((ch = fgetc(fp)) != EOF) {
 		arrayFromChars[i] = ch;
 		i++;
 	}
-	printf("arrayFromChars: %s\n", arrayFromChars);
+	printf("%s", arrayFromChars);
 
-	int j = 0;	/* starting pos of arrayFromChars to read from */
+	// start: reading line from csv
 
-	char name[NAMELEN];
-	writeFromCharsIntoValue(arrayFromChars, name, &j);
-	printf("name: %s\n", name);
+	int m = 0;
+	do {
+		char arrayFromCharsToLine[BUFSIZ];
+		
+		memset(arrayFromCharsToLine, 0, BUFSIZ);
+		printf("...mCharsToLine nach memset: %s\n", arrayFromCharsToLine);
 
-	char film[NAMELEN];
-	writeFromCharsIntoValue(arrayFromChars, film, &j);
-	printf("film: %s\n", film);
+		int n = 0;
+		while ((ch = arrayFromChars[m]) && ch != '\n') {
+			arrayFromCharsToLine[n] = ch;
+			m++;
+			n++;
+		}
+		printf("arrayFromCharsToLine: %s\n", arrayFromCharsToLine);
+		m++;	/* am Zeilenende: auf naechste Zeile wechseln */
 
-	char rating[RATINGLEN];
-	writeFromCharsIntoValue(arrayFromChars, rating, &j);
-	printf("rating: %s\n", rating);
+		int j = 0;	/* start pos of arrayFromCharsToLine to read from */
 
-	Femchar *newNode = malloc(sizeof(Femchar));
-	strncpy(newNode->name, name, NAMELEN);
-	strncpy(newNode->film, film, FILMLEN);
-	newNode->rating = (int) *rating;
+		char name[NAMELEN];
+		writeFromCharsIntoValue(arrayFromCharsToLine, name, &j);
+		printf("name: %s\n", name);
 
-	*anf = newNode;
-	newNode->next = NULL;
+		char film[NAMELEN];
+		writeFromCharsIntoValue(arrayFromCharsToLine, film, &j);
+		printf("film: %s\n", film);
+
+		char rating[RATINGLEN];
+		writeFromCharsIntoValue(arrayFromCharsToLine, rating, &j);
+		printf("rating: %s\n", rating);
+
+		Femchar *newNode = malloc(sizeof(Femchar));
+		strncpy(newNode->name, name, NAMELEN);
+		strncpy(newNode->film, film, FILMLEN);
+		newNode->rating = (int) *rating;
+
+		memset(name, 0, NAMELEN);
+		memset(film, 0, FILMLEN);
+		memset(rating, 0, RATINGLEN);
+
+		*anf = newNode;
+		newNode->next = NULL;
+
+	} while (ch != '\0');
 
 	// end: reading line from csv
 
@@ -297,7 +318,7 @@ void writeFromCharsIntoValue(char chars[], char value[], int *j)
 		}
 		*j += 1;
 	}
-	*j += 1;	/* set pos for next value to be read from arrayFromChars */
+	*j += 1;	/* pos for next value to be read from arrayFromChars */
 }
 
 void editFemchar(Femchar **fem)
