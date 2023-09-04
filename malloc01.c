@@ -234,7 +234,7 @@ void writeFemcharsAllToFile(Femchar *fem)
 {
 	Femchar *selected = fem;
 	if (selected != NULL) {
-		FILE *fp = fopen(getFilename(), "a");
+		FILE *fp = fopen(getFilename(), "w");
 		do {
 			fprintf(fp, "\"%s\"", selected->name);
 			fprintf(fp, ",");
