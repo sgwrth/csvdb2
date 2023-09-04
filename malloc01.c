@@ -298,10 +298,10 @@ void readFemcharsFromFile(Femchar **anf)
 		memset(film, 0, FILMLEN);
 		memset(rating, 0, RATINGLEN);
 
+		newNode->next = *anf;
 		*anf = newNode;
-		newNode->next = NULL;
 
-	} while (ch != '\0');
+	} while (arrayFromChars[m] != '\0');
 
 	// end: reading line from csv
 
