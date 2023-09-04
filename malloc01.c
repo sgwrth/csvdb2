@@ -57,6 +57,9 @@ void main()
 	//writeFemcharsAllToFile(anfang);
 	readFemcharsFromFile(&anfang);
 	printFemcharsAll(anfang);
+	insertFemchar(&anfang);
+	printFemcharsAll(anfang);
+	writeFemcharsAllToFile(anfang);
 }
 
 
@@ -292,7 +295,8 @@ void readFemcharsFromFile(Femchar **anf)
 		Femchar *newNode = malloc(sizeof(Femchar));
 		strncpy(newNode->name, name, NAMELEN);
 		strncpy(newNode->film, film, FILMLEN);
-		newNode->rating = (int) *rating;
+		int temp = atoi(rating);
+		newNode->rating = temp;
 
 		memset(name, 0, NAMELEN);
 		memset(film, 0, FILMLEN);
