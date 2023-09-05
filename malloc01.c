@@ -214,6 +214,7 @@ char *getFilename()
 	//char filename[12];
 	printf("enter filename (max. 12 characters): ");
 	scanf("%s", filename);
+	clearBuffer(stdin);
 	return filename;
 }
 
