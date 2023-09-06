@@ -33,6 +33,7 @@ void writeFemcharToFile(Femchar *);
 void writeFemcharsAllToFile(Femchar *);
 void readFemcharsFromFile(Femchar **);
 void writeFromCharsIntoValue(char[], char[], int *);
+void editFemchar(Femchar **);
 
 /* ===== MAIN =============================================================== */
 
@@ -41,7 +42,6 @@ void main()
 	Femchar *anfang = NULL;
 	//insertFemchar(&anfang);
 	//printFemcharsAll(anfang);
-	/* printFemchar(selectFemchar(anfang)); */
 	/* selectFemchar(anfang); */
 
 	/*
@@ -57,7 +57,10 @@ void main()
 	//writeFemcharsAllToFile(anfang);
 	readFemcharsFromFile(&anfang);
 	printFemcharsAll(anfang);
-	insertFemchar(&anfang);
+	//insertFemchar(&anfang);
+	//printFemcharsAll(anfang);
+	//printFemchar(selectFemchar(anfang));
+	editFemchar(&anfang);
 	printFemcharsAll(anfang);
 	writeFemcharsAllToFile(anfang);
 }
@@ -194,9 +197,15 @@ char *enterSearchStringName()
 {
 	char *searchString = malloc(NAMELEN);
 	printf("Enter search name: ");
-	scanf("%s", searchString);
-	clearBuffer(stdin);
-	return searchString;
+	fgets(searchString, NAMELEN, stdin);
+	
+	// delete '\n' am Stringende:
+	char *tempString = malloc(NAMELEN);
+	strncpy(tempString, searchString, strlen(searchString) - 1);
+
+	free(searchString);
+	//clearBuffer(stdin);
+	return tempString;
 }
 
 Femchar* selectFemchar(Femchar *fem)
@@ -211,7 +220,6 @@ Femchar* selectFemchar(Femchar *fem)
 char *getFilename()
 {
 	char *filename = malloc(12);
-	//char filename[12];
 	printf("enter filename (max. 12 characters): ");
 	scanf("%s", filename);
 	clearBuffer(stdin);
@@ -268,7 +276,6 @@ void readFemcharsFromFile(Femchar **anf)
 		char arrayFromCharsToLine[BUFSIZ];
 		
 		memset(arrayFromCharsToLine, 0, BUFSIZ);
-		printf("...mCharsToLine nach memset: %s\n", arrayFromCharsToLine);
 
 		int n = 0;
 		while ((ch = arrayFromChars[m]) && ch != '\n') {
@@ -276,22 +283,18 @@ void readFemcharsFromFile(Femchar **anf)
 			m++;
 			n++;
 		}
-		printf("arrayFromCharsToLine: %s\n", arrayFromCharsToLine);
 		m++;	/* am Zeilenende: auf naechste Zeile wechseln */
 
 		int j = 0;	/* start pos of arrayFromCharsToLine to read from */
 
 		char name[NAMELEN];
 		writeFromCharsIntoValue(arrayFromCharsToLine, name, &j);
-		printf("name: %s\n", name);
 
 		char film[NAMELEN];
 		writeFromCharsIntoValue(arrayFromCharsToLine, film, &j);
-		printf("film: %s\n", film);
 
 		char rating[RATINGLEN];
 		writeFromCharsIntoValue(arrayFromCharsToLine, rating, &j);
-		printf("rating: %s\n", rating);
 
 		Femchar *newNode = malloc(sizeof(Femchar));
 		strncpy(newNode->name, name, NAMELEN);
@@ -328,4 +331,6 @@ void writeFromCharsIntoValue(char chars[], char value[], int *j)
 
 void editFemchar(Femchar **fem)
 {
+	Femchar *editThis = selectFemchar(*fem);
+	setFemcharData(editThis);
 }
