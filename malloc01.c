@@ -201,6 +201,7 @@ char *enterSearchStringName()
 	
 	// delete '\n' am Stringende:
 	char *tempString = malloc(NAMELEN);
+	memset(tempString, 0, NAMELEN);
 	strncpy(tempString, searchString, strlen(searchString) - 1);
 
 	free(searchString);
