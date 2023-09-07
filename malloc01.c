@@ -15,6 +15,10 @@ struct FemcharStruct {
 };
 
 void clearBuffer(FILE *);
+int isSetName(Femchar *);
+int isSetFilm(Femchar *);
+int isSetRating(Femchar *);
+void askIfEnterNewValue(char *, char *);
 void setFemcharName(Femchar *);
 void setFemcharFilm(Femchar *);
 void setFemcharRating(Femchar *);
@@ -74,27 +78,94 @@ void clearBuffer(FILE *fp) {
 		/* do nothing */ ;
 }
 
+int isSetName(Femchar *fem)
+{
+	int isSet = 0;
+	if (fem->name)
+		isSet = 1;
+	return isSet;
+}
+
+int isSetFilm(Femchar *fem)
+{
+	int isSet = 0;
+	if (fem->film)
+		isSet = 1;
+	return isSet;
+}
+
+int isSetRating(Femchar *fem)
+{
+	int isSet = 0;
+	if (fem->rating)
+		isSet = 1;
+	return isSet;
+}
+
+void askIfEnterNewValue(char *nameOfValue, char *editYesNo)
+{
+	do {
+		printf("do you want to enter a new %s?  y / n: ", nameOfValue);
+		scanf("%c", editYesNo);
+		clearBuffer(stdin);
+	} while (*editYesNo != 'y' && *editYesNo != 'n');
+}
+
 void setFemcharName(Femchar *fem)
 {
-	printf("Bitte Name eingeben: ");
-	fgets(fem->name, sizeof(fem->name), stdin);
-	fem->name[strcspn(fem->name, "\n")] = 0;
+	int isSet = isSetName(fem);
+	if (isSet == 1) {
+		printf("current name: %s\n", fem->name);
+		char editYesNo;
+		char *nameOfValue = malloc(sizeof("name"));
+		strcpy(nameOfValue, "name");
+		askIfEnterNewValue(nameOfValue, &editYesNo);
+		free(nameOfValue);
+		if (editYesNo == 'y') {
+			printf("Bitte Name eingeben: ");
+			fgets(fem->name, sizeof(fem->name), stdin);
+			fem->name[strcspn(fem->name, "\n")] = 0;
+		}
+	}
 }
 
 void setFemcharFilm(Femchar *fem)
 {
-	printf("Bitte Film eingeben: ");
-	fgets(fem->film, sizeof(fem->name), stdin);
-	fem->film[strcspn(fem->film, "\n")] = 0;
+	int isSet = isSetFilm(fem);
+	if (isSet == 1) {
+		printf("current film: %s\n", fem->film);
+		char editYesNo;
+		char *nameOfValue = malloc(sizeof("film"));
+		strcpy(nameOfValue, "film");
+		askIfEnterNewValue(nameOfValue, &editYesNo);
+		free(nameOfValue);
+		if (editYesNo == 'y') {
+			printf("Bitte Film eingeben: ");
+			fgets(fem->film, sizeof(fem->film), stdin);
+			fem->film[strcspn(fem->film, "\n")] = 0;
+		}
+	}
 }
 
 void setFemcharRating(Femchar *fem)
 {
-	int rating;
-	printf("Bitte Rating eingeben: ");
-	scanf("%d", &rating);
-	clearBuffer(stdin);
-	fem->rating = rating;
+	int isSet = isSetRating(fem);
+	if (isSet == 1) {
+		printf("current rating: %d\n", fem->rating);
+		char editYesNo;
+		do {
+			printf("do you want to enter a new rating?  y / n: ");
+			scanf("%c", &editYesNo);
+			clearBuffer(stdin);
+		} while (editYesNo != 'y' && editYesNo != 'n');
+		if (editYesNo == 'y') {
+			int rating;
+			printf("Bitte Rating eingeben: ");
+			scanf("%d", &rating);
+			clearBuffer(stdin);
+			fem->rating = rating;
+		}
+	}
 }
 
 void setFemcharData(Femchar *fem)
@@ -201,6 +272,7 @@ char *enterSearchStringName()
 	
 	// delete '\n' am Stringende:
 	char *tempString = malloc(NAMELEN);
+	// garbage values im tempString entfernen:
 	memset(tempString, 0, NAMELEN);
 	strncpy(tempString, searchString, strlen(searchString) - 1);
 
