@@ -277,7 +277,6 @@ char *enterSearchStringName()
 	strncpy(tempString, searchString, strlen(searchString) - 1);
 
 	free(searchString);
-	//clearBuffer(stdin);
 	return tempString;
 }
 
@@ -285,8 +284,12 @@ Femchar* selectFemchar(Femchar *fem)
 {
 	Femchar *selector = fem;
 	char *searchName = enterSearchStringName();
-	while (strcmp(selector->name, searchName) != 0)
+	while (strcmp(selector->name, searchName) != 0) {
+		if (selector->next == NULL) {
+			return NULL;
+		}
 		selector = selector->next;
+	}
 	return selector;
 }
 
@@ -302,14 +305,17 @@ char *getFilename()
 void writeFemcharToFile(Femchar *fem)
 {
 	Femchar *selected = selectFemchar(fem);
-	FILE *fp = fopen(getFilename(), "a");
-	fprintf(fp, "\"%s\"", selected->name);
-	fprintf(fp, ",");
-	fprintf(fp, "\"%s\"", selected->film);
-	fprintf(fp, ",");
-	fprintf(fp, "%d", selected->rating);
-	fprintf(fp, "\n");
-	fclose(fp);
+	if (selected != NULL) {
+		FILE *fp = fopen(getFilename(), "a");
+		fprintf(fp, "\"%s\"", selected->name);
+		fprintf(fp, ",");
+		fprintf(fp, "\"%s\"", selected->film);
+		fprintf(fp, ",");
+		fprintf(fp, "%d", selected->rating);
+		fprintf(fp, "\n");
+		fclose(fp);
+	} else
+		printf("no matching femchar found.\n");
 }
 
 void writeFemcharsAllToFile(Femchar *fem)
@@ -405,5 +411,8 @@ void writeFromCharsIntoValue(char chars[], char value[], int *j)
 void editFemchar(Femchar **fem)
 {
 	Femchar *editThis = selectFemchar(*fem);
-	setFemcharData(editThis);
+	if (editThis != NULL)
+		setFemcharData(editThis);
+	else
+		printf("no matching femchar found.\n");
 }
