@@ -44,10 +44,10 @@ void editFemchar(Femchar **);
 void main()
 {
 	Femchar *anfang = NULL;
+
 	//insertFemchar(&anfang);
 	//printFemcharsAll(anfang);
 	/* selectFemchar(anfang); */
-
 	/*
 	FILE *fp;
 	fp = fopen(getFilename(),"w+");
@@ -56,17 +56,53 @@ void main()
 	fputs("...und hier fputs.\n", fp);
 	fclose(fp);
 	*/
-	
 	//writeFemcharToFile(anfang);
 	//writeFemcharsAllToFile(anfang);
-	readFemcharsFromFile(&anfang);
-	printFemcharsAll(anfang);
-	//insertFemchar(&anfang);
 	//printFemcharsAll(anfang);
 	//printFemchar(selectFemchar(anfang));
-	editFemchar(&anfang);
-	printFemcharsAll(anfang);
-	writeFemcharsAllToFile(anfang);
+
+	// MENU
+	char openOrNewDb;
+	do {
+		printf("open existing DB or create new? enter [o]pen or [n]new: ");
+		scanf("%c", &openOrNewDb);
+		clearBuffer(stdin);
+	} while (openOrNewDb != 'o' && openOrNewDb != 'n');
+	if (openOrNewDb == 'o')
+		readFemcharsFromFile(&anfang);
+	char option;
+	do {
+		do {
+			printf("***\n");
+			printf("MENU\n");
+			printf("What do you want to do?\n");
+			printf("[1] add new entry\n");
+			printf("[2] show all entries\n");
+			printf("[3] edit entry\n");
+			printf("[0] save and quit\n");
+			printf("please enter: ");
+			scanf("%c", &option);
+			clearBuffer(stdin);
+		} while (option != '1'
+				&& option != '2'
+				&& option != '3'
+				&& option != '0'
+		);
+		switch (option) {
+			case '1':
+				insertFemchar(&anfang);
+				break;
+			case '2':
+				printFemcharsAll(anfang);
+				break;
+			case '3':
+				editFemchar(&anfang);
+				break;
+			case '0':
+				writeFemcharsAllToFile(anfang);
+				break;
+		}
+	} while (option != '0');
 }
 
 
@@ -81,7 +117,7 @@ void clearBuffer(FILE *fp) {
 int isSetName(Femchar *fem)
 {
 	int isSet = 0;
-	if (fem->name)
+	if (fem->name != '\0')
 		isSet = 1;
 	return isSet;
 }
@@ -89,7 +125,7 @@ int isSetName(Femchar *fem)
 int isSetFilm(Femchar *fem)
 {
 	int isSet = 0;
-	if (fem->film)
+	if (fem->film != '\0')
 		isSet = 1;
 	return isSet;
 }
@@ -97,7 +133,7 @@ int isSetFilm(Femchar *fem)
 int isSetRating(Femchar *fem)
 {
 	int isSet = 0;
-	if (fem->rating)
+	if (fem->rating != 0)
 		isSet = 1;
 	return isSet;
 }
@@ -186,6 +222,9 @@ void insertFemcharAtFront(Femchar **anf)
 void insertFemcharAtBack(Femchar **anf)
 {
 	Femchar *new = malloc(sizeof(Femchar));
+	memset(new->name, 0, NAMELEN);
+	memset(new->film, 0, FILMLEN);
+	new->rating = 0;
 	Femchar *helper;
 	helper = *anf;
 	/* noch kein Eintrag vorhanden (*anf == NULL) */
@@ -348,14 +387,10 @@ void readFemcharsFromFile(Femchar **anf)
 	}
 	printf("%s", arrayFromChars);
 
-	// start: reading line from csv
-
 	int m = 0;
 	do {
 		char arrayFromCharsToLine[BUFSIZ];
-		
 		memset(arrayFromCharsToLine, 0, BUFSIZ);
-
 		int n = 0;
 		while ((ch = arrayFromChars[m]) && ch != '\n') {
 			arrayFromCharsToLine[n] = ch;
@@ -363,7 +398,6 @@ void readFemcharsFromFile(Femchar **anf)
 			n++;
 		}
 		m++;	/* am Zeilenende: auf naechste Zeile wechseln */
-
 		int j = 0;	/* start pos of arrayFromCharsToLine to read from */
 
 		char name[NAMELEN];
@@ -387,11 +421,7 @@ void readFemcharsFromFile(Femchar **anf)
 
 		newNode->next = *anf;
 		*anf = newNode;
-
 	} while (arrayFromChars[m] != '\0');
-
-	// end: reading line from csv
-
 	fclose(fp);
 }
 
