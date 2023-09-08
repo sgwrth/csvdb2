@@ -117,7 +117,7 @@ void clearBuffer(FILE *fp) {
 int isSetName(Femchar *fem)
 {
 	int isSet = 0;
-	if (fem->name != '\0')
+	if ((strncmp(fem->name, "[undefined]", sizeof("[undefined]")) != 0))
 		isSet = 1;
 	return isSet;
 }
@@ -125,7 +125,7 @@ int isSetName(Femchar *fem)
 int isSetFilm(Femchar *fem)
 {
 	int isSet = 0;
-	if (fem->film != '\0')
+	if ((strncmp(fem->film, "[undefined]", sizeof("[undefined]")) != 0))
 		isSet = 1;
 	return isSet;
 }
@@ -162,6 +162,10 @@ void setFemcharName(Femchar *fem)
 			fgets(fem->name, sizeof(fem->name), stdin);
 			fem->name[strcspn(fem->name, "\n")] = 0;
 		}
+	} else {
+		printf("Bitte Name eingeben: ");
+		fgets(fem->name, sizeof(fem->name), stdin);
+		fem->name[strcspn(fem->name, "\n")] = 0;
 	}
 }
 
@@ -180,6 +184,10 @@ void setFemcharFilm(Femchar *fem)
 			fgets(fem->film, sizeof(fem->film), stdin);
 			fem->film[strcspn(fem->film, "\n")] = 0;
 		}
+	} else {
+		printf("Bitte Film eingeben: ");
+		fgets(fem->film, sizeof(fem->film), stdin);
+		fem->film[strcspn(fem->film, "\n")] = 0;
 	}
 }
 
@@ -201,6 +209,12 @@ void setFemcharRating(Femchar *fem)
 			clearBuffer(stdin);
 			fem->rating = rating;
 		}
+	} else {
+		int rating;
+		printf("Bitte Rating eingeben: ");
+		scanf("%d", &rating);
+		clearBuffer(stdin);
+		fem->rating = rating;
 	}
 }
 
@@ -222,8 +236,8 @@ void insertFemcharAtFront(Femchar **anf)
 void insertFemcharAtBack(Femchar **anf)
 {
 	Femchar *new = malloc(sizeof(Femchar));
-	memset(new->name, 0, NAMELEN);
-	memset(new->film, 0, FILMLEN);
+	strncpy(new->name, "[undefined]", NAMELEN);
+	strncpy(new->film, "[undefined]", FILMLEN);
 	new->rating = 0;
 	Femchar *helper;
 	helper = *anf;
