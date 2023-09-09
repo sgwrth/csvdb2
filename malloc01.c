@@ -17,7 +17,13 @@ enum Option {
 	EditEntry = '3',
 	SaveAndQuit = '0'
 };
-	
+
+enum OpenFile {
+	Undefined = 'u',
+	TryAgain = 't',
+	Quit = 'q'
+};
+
 typedef struct FemcharStruct Femchar;
 struct FemcharStruct {
 	char name[NAMELEN];
@@ -406,7 +412,18 @@ void writeFemcharsAllToFile(Femchar *fem)
 
 void readFemcharsFromFile(Femchar **anf)
 {
-	FILE *fp = fopen(getFilename(), "r");
+	FILE *fp;
+	while (fopen(getFilename(), "r") == NULL) {
+		printf("error: file not found\n");
+		char tryAgainOrQuit = Undefined;
+		while (tryAgainOrQuit != TryAgain && tryAgainOrQuit != Quit) {
+			printf("[t]ry again or [q]uit the program? enter: ");
+			scanf("%c", &tryAgainOrQuit);
+			clearBuffer(stdin);
+		}
+		if (tryAgainOrQuit == Quit)
+			exit(0);
+	}
 	char ch;
 	char arrayFromChars[BUFSIZ];
 	int i = 0;
