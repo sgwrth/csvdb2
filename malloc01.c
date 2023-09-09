@@ -6,6 +6,18 @@
 #define FILMLEN 25
 #define RATINGLEN 6
 
+enum Db {
+	Open = 'o',
+	New = 'n'
+};
+
+enum Option {
+	AddNewEntry = '1',
+	ShowAllEntries = '2',
+	EditEntry = '3',
+	SaveAndQuit = '0'
+};
+	
 typedef struct FemcharStruct Femchar;
 struct FemcharStruct {
 	char name[NAMELEN];
@@ -15,8 +27,8 @@ struct FemcharStruct {
 };
 
 char decideOnDb();
-void pickOption(char *);
-void executeOption(Femchar **, char *);
+void pickOption(enum Option *);
+void executeOption(Femchar **, enum Option *);
 void clearBuffer(FILE *);
 int isSetName(Femchar *);
 int isSetFilm(Femchar *);
@@ -47,16 +59,14 @@ void editFemchar(Femchar **);
 void main()
 {
 	Femchar *anfang = NULL;
-
-	// MENU
-	char openOrNewDb = decideOnDb();
-	if (openOrNewDb == 'o')
+	enum Db openOrNewDb = decideOnDb();
+	if (openOrNewDb == Open)
 		readFemcharsFromFile(&anfang);
-	char option;
+	enum Option option;
 	do {
 		pickOption(&option);
 		executeOption(&anfang, &option);
-	} while (option != '0');
+	} while (option != SaveAndQuit );
 }
 
 
@@ -73,7 +83,7 @@ char decideOnDb()
 	return openOrNewDb;
 }
 
-void pickOption(char *option)
+void pickOption(enum Option *option)
 {
 	do {
 		printf("***\n");
@@ -86,26 +96,26 @@ void pickOption(char *option)
 		printf("please enter: ");
 		scanf("%c", option);
 		clearBuffer(stdin);
-	} while (*option != '1'
-			&& *option != '2'
-			&& *option != '3'
-			&& *option != '0'
+	} while (*option != AddNewEntry
+			&& *option != ShowAllEntries
+			&& *option != EditEntry
+			&& *option != SaveAndQuit
 	);
 }
 
-void executeOption(Femchar **anf, char *option)
+void executeOption(Femchar **anf, enum Option *option)
 {
 	switch (*option) {
-		case '1':
+		case AddNewEntry:
 			insertFemchar(anf);
 			break;
-		case '2':
+		case ShowAllEntries:
 			printFemcharsAll(*anf);
 			break;
-		case '3':
+		case EditEntry:
 			editFemchar(anf);
 			break;
-		case '0':
+		case SaveAndQuit:
 			writeFemcharsAllToFile(*anf);
 			break;
 	}
