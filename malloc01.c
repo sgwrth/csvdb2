@@ -14,6 +14,9 @@ struct FemcharStruct {
 	Femchar *next;
 };
 
+char decideOnDb();
+void pickOption(char *);
+void executeOption(Femchar **, char *);
 void clearBuffer(FILE *);
 int isSetName(Femchar *);
 int isSetFilm(Femchar *);
@@ -45,68 +48,68 @@ void main()
 {
 	Femchar *anfang = NULL;
 
-	//insertFemchar(&anfang);
-	//printFemcharsAll(anfang);
-	/* selectFemchar(anfang); */
-	/*
-	FILE *fp;
-	fp = fopen(getFilename(),"w+");
-	int number = 9;
-	fprintf(fp, "Hallo, hier fprintf.  %d\n", number);
-	fputs("...und hier fputs.\n", fp);
-	fclose(fp);
-	*/
-	//writeFemcharToFile(anfang);
-	//writeFemcharsAllToFile(anfang);
-	//printFemcharsAll(anfang);
-	//printFemchar(selectFemchar(anfang));
-
 	// MENU
+	char openOrNewDb = decideOnDb();
+	if (openOrNewDb == 'o')
+		readFemcharsFromFile(&anfang);
+	char option;
+	do {
+		pickOption(&option);
+		executeOption(&anfang, &option);
+	} while (option != '0');
+}
+
+
+/* ----- Functions ---------------------------------------------------------- */
+
+char decideOnDb()
+{
 	char openOrNewDb;
 	do {
 		printf("open existing DB or create new? enter [o]pen or [n]new: ");
 		scanf("%c", &openOrNewDb);
 		clearBuffer(stdin);
 	} while (openOrNewDb != 'o' && openOrNewDb != 'n');
-	if (openOrNewDb == 'o')
-		readFemcharsFromFile(&anfang);
-	char option;
-	do {
-		do {
-			printf("***\n");
-			printf("MENU\n");
-			printf("What do you want to do?\n");
-			printf("[1] add new entry\n");
-			printf("[2] show all entries\n");
-			printf("[3] edit entry\n");
-			printf("[0] save and quit\n");
-			printf("please enter: ");
-			scanf("%c", &option);
-			clearBuffer(stdin);
-		} while (option != '1'
-				&& option != '2'
-				&& option != '3'
-				&& option != '0'
-		);
-		switch (option) {
-			case '1':
-				insertFemchar(&anfang);
-				break;
-			case '2':
-				printFemcharsAll(anfang);
-				break;
-			case '3':
-				editFemchar(&anfang);
-				break;
-			case '0':
-				writeFemcharsAllToFile(anfang);
-				break;
-		}
-	} while (option != '0');
+	return openOrNewDb;
 }
 
+void pickOption(char *option)
+{
+	do {
+		printf("***\n");
+		printf("MENU\n");
+		printf("What do you want to do?\n");
+		printf("[1] add new entry\n");
+		printf("[2] show all entries\n");
+		printf("[3] edit entry\n");
+		printf("[0] save and quit\n");
+		printf("please enter: ");
+		scanf("%c", option);
+		clearBuffer(stdin);
+	} while (*option != '1'
+			&& *option != '2'
+			&& *option != '3'
+			&& *option != '0'
+	);
+}
 
-/* ----- Functions ---------------------------------------------------------- */
+void executeOption(Femchar **anf, char *option)
+{
+	switch (*option) {
+		case '1':
+			insertFemchar(anf);
+			break;
+		case '2':
+			printFemcharsAll(*anf);
+			break;
+		case '3':
+			editFemchar(anf);
+			break;
+		case '0':
+			writeFemcharsAllToFile(*anf);
+			break;
+	}
+}
 
 void clearBuffer(FILE *fp) {
 	int ch;
