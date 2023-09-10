@@ -412,8 +412,8 @@ void writeFemcharsAllToFile(Femchar *fem)
 
 void readFemcharsFromFile(Femchar **anf)
 {
-	FILE *fp;
-	while (fopen(getFilename(), "r") == NULL) {
+	FILE *fp = fopen(getFilename(), "r");
+	while (fp == NULL) {
 		printf("error: file not found\n");
 		char tryAgainOrQuit = Undefined;
 		while (tryAgainOrQuit != TryAgain && tryAgainOrQuit != Quit) {
@@ -423,6 +423,7 @@ void readFemcharsFromFile(Femchar **anf)
 		}
 		if (tryAgainOrQuit == Quit)
 			exit(0);
+		fp = fopen(getFilename(), "r");
 	}
 	char ch;
 	char arrayFromChars[BUFSIZ];
