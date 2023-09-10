@@ -25,6 +25,11 @@ enum OpenFile {
 	Quit = 'q'
 };
 
+enum InsertPos {
+	AtFront = 'f',
+	AtBack = 'b'
+};
+
 typedef struct FemcharStruct Femchar;
 struct FemcharStruct {
 	char name[NAMELEN];
@@ -45,11 +50,12 @@ void setFemcharName(Femchar *);
 void setFemcharFilm(Femchar *);
 void setFemcharRating(Femchar *);
 void setFemcharData(Femchar *);
+char enterAnother();
 void insertFemcharAtFront(Femchar **);
 void insertFemcharAtBack(Femchar **);
 void printFemcharsAll(Femchar *);
 void printFemchar(Femchar *);
-char getInsertPos();
+enum InsertPos getInsertPos();
 int getNumOfInserts();
 void insertFemchar(Femchar **);
 char *enterSearchStringName();
@@ -100,8 +106,9 @@ char pickOption(Femchar **anf)
 		if (*anf != NULL) {
 			printf("[2] show all entries\n");
 			printf("[3] edit entry\n");
-		}
-		printf("[0] save and quit\n");
+			printf("[0] save and quit\n");
+		} else
+			printf("[0] quit\n");
 		printf("please enter: ");
 		scanf("%c", &option);
 		clearBuffer(stdin);
@@ -303,7 +310,7 @@ void printFemchar(Femchar *fem)
 	printf("\n");
 }
 
-char getInsertPos()
+enum InsertPos getInsertPos()
 {
 	char pos;
 	do {
@@ -311,32 +318,38 @@ char getInsertPos()
 		scanf("%c", &pos);
 		clearBuffer(stdin);
 	} while (pos != 'f' && pos != 'b');
-	return pos;
+	if (pos == 'f')
+		return AtFront;
+	return AtBack;
 }
 
-int getNumOfInserts()
+char enterAnother()
 {
-	int num;
-	printf("How many entries?  Please enter: ");
-	scanf("%d", &num);
-	clearBuffer(stdin);
-	return num;
+	char enterAnother;
+	do {
+		printf("do you want to add another character? [y] or [n]: ");
+		scanf("%c", &enterAnother);
+		clearBuffer(stdin);
+	} while (enterAnother != 'y' && enterAnother != 'n');
+	return enterAnother;
 }
 
 void insertFemchar(Femchar **fem)
 {
-	char pos = getInsertPos();
-	int num = getNumOfInserts();
-	if (pos == 'f') {
-		for (int i = 0; i < num; i++) {
-			printf("### Enter Character [%d of %d] ###\n", i+1, num);
+	enum InsertPos pos = getInsertPos();
+	char enterAnotherEntry = 'u';
+	if (pos == AtFront ) {
+		do {
+			printf("### Enter Character\n");
 			insertFemcharAtFront(fem);
-		}
+			enterAnotherEntry = enterAnother();
+		} while (enterAnotherEntry != 'n');
 	} else {
-		for (int i = 0; i < num; i++) {
-			printf("### Enter Character [%d of %d] ###\n", i+1, num);
+		do {
+			printf("### Enter Character\n");
 			insertFemcharAtBack(fem);
-		}
+			enterAnotherEntry = enterAnother();
+		} while (enterAnotherEntry != 'n');
 	}
 }
 
