@@ -40,7 +40,7 @@ struct FemcharStruct {
 
 char decideOnDb();
 char pickOption(Femchar **);
-void executeOption(Femchar **, char);
+void executeOption(char, Femchar **);
 void clearBuffer(FILE *);
 int isSetName(Femchar *);
 int isSetFilm(Femchar *);
@@ -63,13 +63,14 @@ Femchar* selectFemchar(Femchar *);
 char *getFilename();
 void writeFemcharToFile(Femchar *); 
 void writeFemcharsAllToFile(Femchar *);
+FILE *openFileOrNull();
 int readFemcharsFromFile(Femchar **);
 void writeFromCharsIntoValue(char[], char[], int *);
 void editFemchar(Femchar **);
 
 /* ===== MAIN =============================================================== */
 
-void main()
+int main()
 {
 	Femchar *anfang = NULL;
 	enum Db openOrNewDb = decideOnDb();
@@ -78,8 +79,9 @@ void main()
 	char option;
 	do {
 		option = pickOption(&anfang);
-		executeOption(&anfang, option);
+		executeOption(option, &anfang);
 	} while (option != SaveAndQuit );
+	return 0;
 }
 
 /* ----- Functions ---------------------------------------------------------- */
@@ -91,7 +93,7 @@ char decideOnDb()
 		printf("open existing DB or create new? enter [o]pen or [n]new: ");
 		scanf("%c", &openOrNewDb);
 		clearBuffer(stdin);
-	} while (openOrNewDb != 'o' && openOrNewDb != 'n');
+	} while (openOrNewDb != Open && openOrNewDb != New);
 	return openOrNewDb;
 }
 
@@ -120,7 +122,7 @@ char pickOption(Femchar **anf)
 	return option;
 }
 
-void executeOption(Femchar **anf, char option)
+void executeOption(char option, Femchar **anf)
 {
 	switch (option) {
 		case AddNewEntry:
@@ -425,8 +427,8 @@ void writeFemcharsAllToFile(Femchar *fem)
 	}
 }
 
-int readFemcharsFromFile(Femchar **anf)
-{
+FILE *openFileOrNull()
+{	
 	FILE *fp = fopen(getFilename(), "r");
 	while (fp == NULL) {
 		printf("error: file not found\n");
@@ -441,12 +443,20 @@ int readFemcharsFromFile(Femchar **anf)
 			scanf("%c", &tryAgainOrQuit);
 			clearBuffer(stdin);
 		}
-		if (tryAgainOrQuit == 'c')
-			return 0;
+		if (tryAgainOrQuit == CreateNew)
+			return NULL;
 		else if (tryAgainOrQuit == Quit)
 			exit(0);
 		fp = fopen(getFilename(), "r");
 	}
+	return fp;
+}
+
+int readFemcharsFromFile(Femchar **anf)
+{
+	FILE *fp = openFileOrNull();
+	if (fp == NULL)
+		return 0;
 	char ch;
 	char arrayFromChars[BUFSIZ];
 	int i = 0;
@@ -471,10 +481,8 @@ int readFemcharsFromFile(Femchar **anf)
 
 		char name[NAMELEN];
 		writeFromCharsIntoValue(arrayFromCharsToLine, name, &j);
-
 		char film[NAMELEN];
 		writeFromCharsIntoValue(arrayFromCharsToLine, film, &j);
-
 		char rating[RATINGLEN];
 		writeFromCharsIntoValue(arrayFromCharsToLine, rating, &j);
 
