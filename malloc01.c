@@ -21,6 +21,7 @@ enum Option {
 enum OpenFile {
 	Undefined = 'u',
 	TryAgain = 't',
+	CreateNew = 'c',
 	Quit = 'q'
 };
 
@@ -33,7 +34,7 @@ struct FemcharStruct {
 };
 
 char decideOnDb();
-char pickOption();
+char pickOption(Femchar **);
 void executeOption(Femchar **, char);
 void clearBuffer(FILE *);
 int isSetName(Femchar *);
@@ -56,7 +57,7 @@ Femchar* selectFemchar(Femchar *);
 char *getFilename();
 void writeFemcharToFile(Femchar *); 
 void writeFemcharsAllToFile(Femchar *);
-void readFemcharsFromFile(Femchar **);
+int readFemcharsFromFile(Femchar **);
 void writeFromCharsIntoValue(char[], char[], int *);
 void editFemchar(Femchar **);
 
@@ -70,11 +71,10 @@ void main()
 		readFemcharsFromFile(&anfang);
 	char option;
 	do {
-		option = pickOption();
+		option = pickOption(&anfang);
 		executeOption(&anfang, option);
 	} while (option != SaveAndQuit );
 }
-
 
 /* ----- Functions ---------------------------------------------------------- */
 
@@ -89,7 +89,7 @@ char decideOnDb()
 	return openOrNewDb;
 }
 
-char pickOption()
+char pickOption(Femchar **anf)
 {
 	char option;
 	do {
@@ -97,8 +97,10 @@ char pickOption()
 		printf("MENU\n");
 		printf("What do you want to do?\n");
 		printf("[1] add new entry\n");
-		printf("[2] show all entries\n");
-		printf("[3] edit entry\n");
+		if (*anf != NULL) {
+			printf("[2] show all entries\n");
+			printf("[3] edit entry\n");
+		}
 		printf("[0] save and quit\n");
 		printf("please enter: ");
 		scanf("%c", &option);
@@ -410,18 +412,25 @@ void writeFemcharsAllToFile(Femchar *fem)
 	}
 }
 
-void readFemcharsFromFile(Femchar **anf)
+int readFemcharsFromFile(Femchar **anf)
 {
 	FILE *fp = fopen(getFilename(), "r");
 	while (fp == NULL) {
 		printf("error: file not found\n");
 		char tryAgainOrQuit = Undefined;
-		while (tryAgainOrQuit != TryAgain && tryAgainOrQuit != Quit) {
-			printf("[t]ry again or [q]uit the program? enter: ");
+		while (tryAgainOrQuit != TryAgain
+				&& tryAgainOrQuit != CreateNew 
+				&& tryAgainOrQuit != Quit) {
+			printf("[t]ry again\n"),
+			printf("[c]reate a new db\n");
+			printf("[q]uit the program?\n");
+			printf("enter: ");
 			scanf("%c", &tryAgainOrQuit);
 			clearBuffer(stdin);
 		}
-		if (tryAgainOrQuit == Quit)
+		if (tryAgainOrQuit == 'c')
+			return 0;
+		else if (tryAgainOrQuit == Quit)
 			exit(0);
 		fp = fopen(getFilename(), "r");
 	}
@@ -470,6 +479,7 @@ void readFemcharsFromFile(Femchar **anf)
 		*anf = newNode;
 	} while (arrayFromChars[m] != '\0');
 	fclose(fp);
+	return 0;
 }
 
 void writeFromCharsIntoValue(char chars[], char value[], int *j)
