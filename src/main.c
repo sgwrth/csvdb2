@@ -1,11 +1,15 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "./app/db.h"
+#include "./enums/enums.h"
+#include "./utils/buf.h"
 
 #define NAME_LEN 25
 #define PHONENUMBER_LEN 25
-#define YEAR_OF_BIRTH_LEN 6
+#define YEAR_OF_BIRTH_LEN 4
 
+/*
 enum Db {
 	OPEN = 'o',
 	NEW = 'n'
@@ -18,17 +22,18 @@ enum Option {
 	SAVE_AND_QUIT = '0'
 };
 
-enum OPEN_file {
+enum Open_file {
 	UNDEFINED = 'u',
 	TRY_AGAIN = 't',
 	CREATE_NEW = 'c',
 	QUIT = 'q'
 };
 
-enum InsertPos {
+enum Insert_pos {
 	AT_FRONT = 'f',
 	AT_BACK = 'b'
 };
+*/
 
 typedef struct Entry_struct Entry;
 struct Entry_struct {
@@ -38,10 +43,10 @@ struct Entry_struct {
 	Entry *next;
 };
 
-char decide_on_db();
+// char decide_on_db();
 char pick_opt(Entry**);
 void exec_opt(char, Entry**);
-void clr_buf(FILE*);
+// void clr_buf(FILE*);
 int is_set_name(Entry*);
 int is_set_phonenumber(Entry*);
 int is_set_year_of_birth(Entry*);
@@ -55,7 +60,7 @@ void insert_at_front(Entry**);
 void insert_at_back(Entry**);
 void print_entries(Entry*);
 void print_entry(Entry*);
-enum InsertPos get_insert_pos();
+enum Insert_pos get_insert_pos();
 int get_num_of_inserts();
 void insert_entry(Entry**);
 char *enter_search_name();
@@ -82,6 +87,7 @@ int main()
 	return 0;
 }
 
+/*
 char decide_on_db()
 {
 	char open_or_new_db;
@@ -92,6 +98,7 @@ char decide_on_db()
 	} while (open_or_new_db != OPEN && open_or_new_db != NEW);
 	return open_or_new_db;
 }
+*/
 
 char pick_opt(Entry **begin)
 {
@@ -136,11 +143,11 @@ void exec_opt(char option, Entry **begin)
 	}
 }
 
-void clr_buf(FILE *fp) {
-	int ch;
-	while ((ch = fgetc(fp)) != EOF && ch != '\n')
-		/* Do nothing. */ ;
-}
+// void clr_buf(FILE *fp) {
+// 	int ch;
+// 	while ((ch = fgetc(fp)) != EOF && ch != '\n')
+// 		/* Do nothing. */ ;
+// }
 
 int is_set_name(Entry *entry)
 {
@@ -306,7 +313,7 @@ void print_entry(Entry *entry)
 	printf("\n");
 }
 
-enum InsertPos get_insert_pos()
+enum Insert_pos get_insert_pos()
 {
 	char pos;
 	do {
@@ -332,17 +339,17 @@ char enter_another()
 
 void insert_entry(Entry **entry)
 {
-	enum InsertPos pos = get_insert_pos();
+	enum Insert_pos pos = get_insert_pos();
 	char another_entry = 'u';
 	if (pos == AT_FRONT ) {
 		do {
-			printf("### Enter Character\n");
+			printf("### Enter Contact\n");
 			insert_at_front(entry);
 			another_entry = enter_another();
 		} while (another_entry != 'n');
 	} else {
 		do {
-			printf("### Enter Character\n");
+			printf("### Enter Contact\n");
 			insert_at_back(entry);
 			another_entry = enter_another();
 		} while (another_entry != 'n');
@@ -363,7 +370,7 @@ char *enter_search_name()
 	return temp_str;
 }
 
-Entry* select_entry(Entry *entry)
+Entry *select_entry(Entry *entry)
 {
 	Entry *selector = entry;
 	char *search_name = enter_search_name();
@@ -460,6 +467,7 @@ int read_from_file(Entry **begin)
 
 	int m = 0;
 	do {
+        /* Read each line of CSV content. */
 		char array_from_chars_to_line[BUFSIZ];
 		memset(array_from_chars_to_line, 0, BUFSIZ);
 		int n = 0;
@@ -471,19 +479,22 @@ int read_from_file(Entry **begin)
 		m++;        /* At end of line: go to next line. */
 		int j = 0;  /* Starting pos of array_from_chars_to_line to read from. */
 
+        /* Parse the contents of each line to individual values. */
 		char name[NAME_LEN];
 		write_chars_to_val(array_from_chars_to_line, name, &j);
-		char phonenumber[NAME_LEN];
+		char phonenumber[PHONENUMBER_LEN];
 		write_chars_to_val(array_from_chars_to_line, phonenumber, &j);
 		char year_of_birth[YEAR_OF_BIRTH_LEN];
 		write_chars_to_val(array_from_chars_to_line, year_of_birth, &j);
 
+        /* Create new entry from parsed values. */
 		Entry *new_node = malloc(sizeof(Entry));
 		strncpy(new_node->name, name, NAME_LEN);
 		strncpy(new_node->phonenumber, phonenumber, PHONENUMBER_LEN);
 		int temp = atoi(year_of_birth);
 		new_node->year_of_birth = temp;
 
+        /* Clear values. */
 		memset(name, 0, NAME_LEN);
 		memset(phonenumber, 0, PHONENUMBER_LEN);
 		memset(year_of_birth, 0, YEAR_OF_BIRTH_LEN);
