@@ -2,59 +2,13 @@
 #include <string.h>
 #include <stdlib.h>
 #include "./app/db.h"
+#include "./core/entry.h"
+#include "./core/input.h"
+#include "./const/constants.h"
 #include "./enums/enums.h"
 #include "./utils/buf.h"
 
-#define NAME_LEN 25
-#define PHONENUMBER_LEN 25
-#define YEAR_OF_BIRTH_LEN 4
-
-/*
-enum Db {
-	OPEN = 'o',
-	NEW = 'n'
-};
-
-enum Option {
-	ADD_NEW_ENTRY = '1',
-	SHOW_ALL_ENTRIES = '2',
-	EDIT_ENTRY = '3',
-	SAVE_AND_QUIT = '0'
-};
-
-enum Open_file {
-	UNDEFINED = 'u',
-	TRY_AGAIN = 't',
-	CREATE_NEW = 'c',
-	QUIT = 'q'
-};
-
-enum Insert_pos {
-	AT_FRONT = 'f',
-	AT_BACK = 'b'
-};
-*/
-
-typedef struct Entry_struct Entry;
-struct Entry_struct {
-	char name[NAME_LEN];
-	char phonenumber[PHONENUMBER_LEN];
-	int year_of_birth;
-	Entry *next;
-};
-
-// char decide_on_db();
-char pick_opt(Entry**);
 void exec_opt(char, Entry**);
-// void clr_buf(FILE*);
-int is_set_name(Entry*);
-int is_set_phonenumber(Entry*);
-int is_set_year_of_birth(Entry*);
-void ask_if_enter_new_val(char*, char*);
-void set_name(Entry*);
-void set_phonenumber(Entry*);
-void set_year_of_birth(Entry*);
-void set_entry_data(Entry*);
 char enter_another();
 void insert_at_front(Entry**);
 void insert_at_back(Entry**);
@@ -63,7 +17,6 @@ void print_entry(Entry*);
 enum Insert_pos get_insert_pos();
 int get_num_of_inserts();
 void insert_entry(Entry**);
-char *enter_search_name();
 Entry *select_entry(Entry*);
 char *get_filename();
 void write_to_file(Entry*); 
@@ -87,44 +40,6 @@ int main()
 	return 0;
 }
 
-/*
-char decide_on_db()
-{
-	char open_or_new_db;
-	do {
-		printf("[O]pen DB or create [n]ew?  Please enter: ");
-		scanf("%c", &open_or_new_db);
-		clr_buf(stdin);
-	} while (open_or_new_db != OPEN && open_or_new_db != NEW);
-	return open_or_new_db;
-}
-*/
-
-char pick_opt(Entry **begin)
-{
-	char option;
-	do {
-		printf("***\n");
-		printf("MENU\n");
-		printf("What do you want to do?\n");
-		printf("[1] Add new entry\n");
-		if (*begin != NULL) {
-			printf("[2] Show all entries\n");
-			printf("[3] Edit entry\n");
-			printf("[0] Save and quit\n");
-		} else
-			printf("[0] Quit\n");
-		printf("Please enter: ");
-		scanf("%c", &option);
-		clr_buf(stdin);
-	} while (option != ADD_NEW_ENTRY
-			&& option != SHOW_ALL_ENTRIES
-			&& option != EDIT_ENTRY
-			&& option != SAVE_AND_QUIT
-	);
-	return option;
-}
-
 void exec_opt(char option, Entry **begin)
 {
 	switch (option) {
@@ -141,123 +56,6 @@ void exec_opt(char option, Entry **begin)
 			write_all_to_file(*begin);
 			break;
 	}
-}
-
-// void clr_buf(FILE *fp) {
-// 	int ch;
-// 	while ((ch = fgetc(fp)) != EOF && ch != '\n')
-// 		/* Do nothing. */ ;
-// }
-
-int is_set_name(Entry *entry)
-{
-	int is_set = 0;
-	if ((strncmp(entry->name, "[undefined]", sizeof("[undefined]")) != 0))
-		is_set = 1;
-	return is_set;
-}
-
-int is_set_phonenumber(Entry *entry)
-{
-	int is_set = 0;
-	if ((strncmp(entry->phonenumber, "[undefined]", sizeof("[undefined]")) != 0))
-		is_set = 1;
-	return is_set;
-}
-
-int is_set_year_of_birth(Entry *entry)
-{
-	int is_set = 0;
-	if (entry->year_of_birth != 0)
-		is_set = 1;
-	return is_set;
-}
-
-void ask_if_enter_new_val(char *name_of_val, char *edit_yes_no)
-{
-	do {
-		printf("Do you want to enter a new %s?  [Y]es or [n]o: ", name_of_val);
-		scanf("%c", edit_yes_no);
-		clr_buf(stdin);
-	} while (*edit_yes_no != 'y' && *edit_yes_no != 'n');
-}
-
-void set_name(Entry *entry)
-{
-	int is_set = is_set_name(entry);
-	if (is_set == 1) {
-		printf("Current name: %s\n", entry->name);
-		char edit_yes_no;
-		char *name_of_val = malloc(sizeof("name"));
-		strcpy(name_of_val, "name");
-		ask_if_enter_new_val(name_of_val, &edit_yes_no);
-		free(name_of_val);
-		if (edit_yes_no == 'y') {
-			printf("Please enter name: ");
-			fgets(entry->name, sizeof(entry->name), stdin);
-			entry->name[strcspn(entry->name, "\n")] = 0;
-		}
-	} else {
-		printf("Please enter name: ");
-		fgets(entry->name, sizeof(entry->name), stdin);
-		entry->name[strcspn(entry->name, "\n")] = 0;
-	}
-}
-
-void set_phonenumber(Entry *entry)
-{
-	int is_set = is_set_phonenumber(entry);
-	if (is_set == 1) {
-		printf("Current phonenumber: %s\n", entry->phonenumber);
-		char edit_yes_no;
-		char *name_of_val = malloc(sizeof("phonenumber"));
-		strcpy(name_of_val, "phonenumber");
-		ask_if_enter_new_val(name_of_val, &edit_yes_no);
-		free(name_of_val);
-		if (edit_yes_no == 'y') {
-			printf("Please enter phonenumber: ");
-			fgets(entry->phonenumber, sizeof(entry->phonenumber), stdin);
-			entry->phonenumber[strcspn(entry->phonenumber, "\n")] = 0;
-		}
-	} else {
-		printf("Please enter phonenumber: ");
-		fgets(entry->phonenumber, sizeof(entry->phonenumber), stdin);
-		entry->phonenumber[strcspn(entry->phonenumber, "\n")] = 0;
-	}
-}
-
-void set_year_of_birth(Entry *entry)
-{
-	int is_set = is_set_year_of_birth(entry);
-	if (is_set == 1) {
-		printf("Current year of birth: %d\n", entry->year_of_birth);
-		char edit_yes_no;
-		do {
-			printf("Do you want to enter a new year of birth?  [Y]es or [n]o: ");
-			scanf("%c", &edit_yes_no);
-			clr_buf(stdin);
-		} while (edit_yes_no != 'y' && edit_yes_no != 'n');
-		if (edit_yes_no == 'y') {
-			int year_of_birth;
-			printf("Please enter year of birth: ");
-			scanf("%d", &year_of_birth);
-			clr_buf(stdin);
-			entry->year_of_birth = year_of_birth;
-		}
-	} else {
-		int year_of_birth;
-		printf("Please enter year of birth: ");
-		scanf("%d", &year_of_birth);
-		clr_buf(stdin);
-		entry->year_of_birth = year_of_birth;
-	}
-}
-
-void set_entry_data(Entry *entry)
-{
-	set_name(entry);
-	set_phonenumber(entry);
-	set_year_of_birth(entry);
 }
 
 void insert_at_front(Entry **begin)
@@ -341,7 +139,7 @@ void insert_entry(Entry **entry)
 {
 	enum Insert_pos pos = get_insert_pos();
 	char another_entry = 'u';
-	if (pos == AT_FRONT ) {
+	if (pos == AT_FRONT) {
 		do {
 			printf("### Enter Contact\n");
 			insert_at_front(entry);
@@ -356,24 +154,11 @@ void insert_entry(Entry **entry)
 	}
 }
 
-char *enter_search_name()
-{
-	char *search_str = malloc(NAME_LEN);
-	printf("Enter search name: ");
-	fgets(search_str, NAME_LEN, stdin);
-	
-	char *temp_str = malloc(NAME_LEN);    /* Delete '\n' at end of string. */
-	memset(temp_str, 0, NAME_LEN);        /* Remove garbage values in temp_str. */
-	strncpy(temp_str, search_str, strlen(search_str) - 1);
-
-	free(search_str);
-	return temp_str;
-}
-
 Entry *select_entry(Entry *entry)
 {
-	Entry *selector = entry;
+	printf("Enter search name: ");
 	char *search_name = enter_search_name();
+	Entry *selector = entry;
 	while (strcmp(selector->name, search_name) != 0) {
 		if (selector->next == NULL) {
 			return NULL;
@@ -405,7 +190,7 @@ void write_to_file(Entry *entry)
 		fprintf(fp, "\n");
 		fclose(fp);
 	} else
-		printf("no matching entry found.\n");
+		printf("No matching entry found.\n");
 }
 
 void write_all_to_file(Entry *entry)
@@ -442,10 +227,11 @@ FILE *open_file()
 			scanf("%c", &try_again_or_quit);
 			clr_buf(stdin);
 		}
-		if (try_again_or_quit == CREATE_NEW)
+		if (try_again_or_quit == CREATE_NEW) {
 			return NULL;
-		else if (try_again_or_quit == QUIT)
+        } else if (try_again_or_quit == QUIT) {
 			exit(0);
+        }
 		fp = fopen(get_filename(), "r");
 	}
 	return fp;
@@ -454,8 +240,9 @@ FILE *open_file()
 int read_from_file(Entry **begin)
 {
 	FILE *fp = open_file();
-	if (fp == NULL)
+	if (fp == NULL) {
 		return 0;
+    }
 	char ch;
 	char array_from_chars[BUFSIZ];
 	int i = 0;
@@ -482,10 +269,17 @@ int read_from_file(Entry **begin)
         /* Parse the contents of each line to individual values. */
 		char name[NAME_LEN];
 		write_chars_to_val(array_from_chars_to_line, name, &j);
+        printf("j after name: %d\n", j);
 		char phonenumber[PHONENUMBER_LEN];
 		write_chars_to_val(array_from_chars_to_line, phonenumber, &j);
+        printf("j after phonenumber: %d\n", j);
 		char year_of_birth[YEAR_OF_BIRTH_LEN];
 		write_chars_to_val(array_from_chars_to_line, year_of_birth, &j);
+        printf("j after y.o.b.: %d\n", j);
+
+        printf("name: %s\n", name);
+        printf("phonenumber: %s\n", phonenumber);
+        printf("y.o.b.: %s\n", year_of_birth);
 
         /* Create new entry from parsed values. */
 		Entry *new_node = malloc(sizeof(Entry));
@@ -509,7 +303,11 @@ int read_from_file(Entry **begin)
 void write_chars_to_val(char chars[], char value[], int *j)
 {
 	int k = 0;
+	// while (chars[*j] != ',' && chars[*j] != '\0') {
 	while (chars[*j] != ',' && chars[*j] != '\0') {
+        if (chars[*j] == '\n') {
+            return;
+        }
 		if (chars[*j] != '"') {
 			value[k] = chars[*j];
 			k++;
@@ -522,8 +320,9 @@ void write_chars_to_val(char chars[], char value[], int *j)
 void edit_entry(Entry **entry)
 {
 	Entry *edit_this = select_entry(*entry);
-	if (edit_this != NULL)
+	if (edit_this != NULL) {
 		set_entry_data(edit_this);
-	else
+    } else {
 		printf("No matching entry found.\n");
+    }
 }
