@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "./app/db.h"
 #include "./core/entry.h"
+#include "./core/file.h"
 #include "./core/input.h"
 #include "./const/constants.h"
 #include "./enums/enums.h"
@@ -17,13 +18,7 @@ void print_entry(Entry*);
 enum Insert_pos get_insert_pos();
 int get_num_of_inserts();
 void insert_entry(Entry**);
-Entry *select_entry(Entry*);
-char *get_filename();
-void write_to_file(Entry*); 
-void write_all_to_file(Entry*);
-FILE *open_file();
 int read_from_file(Entry**);
-void write_chars_to_val(char[], char[], int*);
 void edit_entry(Entry**);
 
 int main()
@@ -152,169 +147,6 @@ void insert_entry(Entry **entry)
 			another_entry = enter_another();
 		} while (another_entry != 'n');
 	}
-}
-
-Entry *select_entry(Entry *entry)
-{
-	printf("Enter search name: ");
-	char *search_name = enter_search_name();
-	Entry *selector = entry;
-	while (strcmp(selector->name, search_name) != 0) {
-		if (selector->next == NULL) {
-			return NULL;
-		}
-		selector = selector->next;
-	}
-	return selector;
-}
-
-char *get_filename()
-{
-	char *filename = malloc(12);
-	printf("Enter filename (max. 12 characters): ");
-	scanf("%s", filename);
-	clr_buf(stdin);
-	return filename;
-}
-
-void write_to_file(Entry *entry)
-{
-	Entry *selected = select_entry(entry);
-	if (selected != NULL) {
-		FILE *fp = fopen(get_filename(), "a");
-		fprintf(fp, "\"%s\"", selected->name);
-		fprintf(fp, ",");
-		fprintf(fp, "\"%s\"", selected->phonenumber);
-		fprintf(fp, ",");
-		fprintf(fp, "%d", selected->year_of_birth);
-		fprintf(fp, "\n");
-		fclose(fp);
-	} else
-		printf("No matching entry found.\n");
-}
-
-void write_all_to_file(Entry *entry)
-{
-	Entry *selected = entry;
-	if (selected != NULL) {
-		FILE *fp = fopen(get_filename(), "w");
-		do {
-			fprintf(fp, "\"%s\"", selected->name);
-			fprintf(fp, ",");
-			fprintf(fp, "\"%s\"", selected->phonenumber);
-			fprintf(fp, ",");
-			fprintf(fp, "\"%d\"", selected->year_of_birth);
-			fprintf(fp, "\n");
-			selected = selected->next;
-		} while (selected != NULL); 
-	fclose(fp);
-	}
-}
-
-FILE *open_file()
-{	
-	FILE *fp = fopen(get_filename(), "r");
-	while (fp == NULL) {
-		printf("error: file not found\n");
-		char try_again_or_quit = UNDEFINED;
-		while (try_again_or_quit != TRY_AGAIN
-				&& try_again_or_quit != CREATE_NEW
-				&& try_again_or_quit != QUIT) {
-			printf("[T]ry again\n"),
-			printf("[C]reate a new db\n");
-			printf("[Q]uit the program?\n");
-			printf("Enter: ");
-			scanf("%c", &try_again_or_quit);
-			clr_buf(stdin);
-		}
-		if (try_again_or_quit == CREATE_NEW) {
-			return NULL;
-        } else if (try_again_or_quit == QUIT) {
-			exit(0);
-        }
-		fp = fopen(get_filename(), "r");
-	}
-	return fp;
-}
-
-int read_from_file(Entry **begin)
-{
-	FILE *fp = open_file();
-	if (fp == NULL) {
-		return 0;
-    }
-	char ch;
-	char array_from_chars[BUFSIZ];
-	int i = 0;
-	while ((ch = fgetc(fp)) != EOF) {
-		array_from_chars[i] = ch;
-		i++;
-	}
-	printf("%s", array_from_chars);
-
-	int m = 0;
-	do {
-        /* Read each line of CSV content. */
-		char array_from_chars_to_line[BUFSIZ];
-		memset(array_from_chars_to_line, 0, BUFSIZ);
-		int n = 0;
-		while ((ch = array_from_chars[m]) && ch != '\n') {
-			array_from_chars_to_line[n] = ch;
-			m++;
-			n++;
-		}
-		m++;        /* At end of line: go to next line. */
-		int j = 0;  /* Starting pos of array_from_chars_to_line to read from. */
-
-        /* Parse the contents of each line to individual values. */
-		char name[NAME_LEN];
-		write_chars_to_val(array_from_chars_to_line, name, &j);
-        printf("j after name: %d\n", j);
-		char phonenumber[PHONENUMBER_LEN];
-		write_chars_to_val(array_from_chars_to_line, phonenumber, &j);
-        printf("j after phonenumber: %d\n", j);
-		char year_of_birth[YEAR_OF_BIRTH_LEN];
-		write_chars_to_val(array_from_chars_to_line, year_of_birth, &j);
-        printf("j after y.o.b.: %d\n", j);
-
-        printf("name: %s\n", name);
-        printf("phonenumber: %s\n", phonenumber);
-        printf("y.o.b.: %s\n", year_of_birth);
-
-        /* Create new entry from parsed values. */
-		Entry *new_node = malloc(sizeof(Entry));
-		strncpy(new_node->name, name, NAME_LEN);
-		strncpy(new_node->phonenumber, phonenumber, PHONENUMBER_LEN);
-		int temp = atoi(year_of_birth);
-		new_node->year_of_birth = temp;
-
-        /* Clear values. */
-		memset(name, 0, NAME_LEN);
-		memset(phonenumber, 0, PHONENUMBER_LEN);
-		memset(year_of_birth, 0, YEAR_OF_BIRTH_LEN);
-
-		new_node->next = *begin;
-		*begin = new_node;
-	} while (array_from_chars[m] != '\0');
-	fclose(fp);
-	return 0;
-}
-
-void write_chars_to_val(char chars[], char value[], int *j)
-{
-	int k = 0;
-	// while (chars[*j] != ',' && chars[*j] != '\0') {
-	while (chars[*j] != ',' && chars[*j] != '\0') {
-        if (chars[*j] == '\n') {
-            return;
-        }
-		if (chars[*j] != '"') {
-			value[k] = chars[*j];
-			k++;
-		}
-		*j += 1;
-	}
-	*j += 1; /* Pos for next value to be read from array_from_chars. */
 }
 
 void edit_entry(Entry **entry)

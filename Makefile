@@ -1,9 +1,5 @@
 CC = clang
-# CC = gcc
-
-# For gcc only.
 CFLAGS = -g
-
 BUILDDIR = ./build
 SRCDIR = ./src
 OBJFILES = \
@@ -12,7 +8,9 @@ OBJFILES = \
 	$(BUILDDIR)/db.o \
 	$(BUILDDIR)/input.o \
 	$(BUILDDIR)/menu.o \
-	$(BUILDDIR)/entry.o
+	$(BUILDDIR)/entry.o \
+	$(BUILDDIR)/file.o \
+	$(BUILDDIR)/csv.o
 
 $(BUILDDIR)/phonebook: $(OBJFILES)
 	$(CC) $(CFLAGS) -o $(BUILDDIR)/phonebook $(OBJFILES)
@@ -34,6 +32,12 @@ $(BUILDDIR)/menu.o: $(SRCDIR)/app/menu.c
 
 $(BUILDDIR)/entry.o: $(SRCDIR)/core/entry.c
 	$(CC) $(CFLAGS) -c $(SRCDIR)/core/entry.c -o $(BUILDDIR)/entry.o
+
+$(BUILDDIR)/file.o: $(SRCDIR)/core/file.c
+	$(CC) $(CFLAGS) -c $(SRCDIR)/core/file.c -o $(BUILDDIR)/file.o
+
+$(BUILDDIR)/csv.o: $(SRCDIR)/utils/csv.c
+	$(CC) $(CFLAGS) -c $(SRCDIR)/utils/csv.c -o $(BUILDDIR)/csv.o
 
 clean:
 	rm $(BUILDDIR)/phonebook $(BUILDDIR)/*.o

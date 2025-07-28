@@ -45,3 +45,12 @@ char ask_if_enter_new_val(char *name_of_val)
         return edit_yes_no;
 	} while (edit_yes_no != 'y' && edit_yes_no != 'n');
 }
+
+char *get_filename()
+{
+	char *filename = malloc(12);
+	printf("Enter filename (max. 12 characters): ");
+	scanf("%s", filename);
+	clr_buf(stdin);
+	return filename;
+}

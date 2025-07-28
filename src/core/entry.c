@@ -99,3 +99,17 @@ void set_entry_data(Entry *entry)
 	set_phonenumber(entry);
 	set_year_of_birth(entry);
 }
+
+Entry *select_entry(Entry *entry)
+{
+	printf("Enter search name: ");
+	char *search_name = enter_search_name();
+	Entry *selector = entry;
+	while (strcmp(selector->name, search_name) != 0) {
+		if (selector->next == NULL) {
+			return NULL;
+		}
+		selector = selector->next;
+	}
+	return selector;
+}

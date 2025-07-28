@@ -18,5 +18,6 @@ void set_name(Entry*);
 void set_phonenumber(Entry*);
 void set_year_of_birth(Entry*);
 void set_entry_data(Entry*);
+Entry *select_entry(Entry*);
 
 #endif

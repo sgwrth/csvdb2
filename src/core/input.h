@@ -5,5 +5,6 @@
 char pick_opt(Entry **begin);
 char *enter_search_name();
 char ask_if_enter_new_val(char *name_of_val);
+char *get_filename();
 
 #endif
