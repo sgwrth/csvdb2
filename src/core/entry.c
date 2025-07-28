@@ -1,5 +1,8 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include "../app/output.h"
+#include "../core/file.h"
 #include "../core/input.h"
 #include "../utils/buf.h"
 #include "./entry.h"
@@ -112,4 +115,78 @@ Entry *select_entry(Entry *entry)
 		selector = selector->next;
 	}
 	return selector;
+}
+
+void insert_at_front(Entry **begin)
+{
+	Entry *temp = malloc(sizeof(Entry));
+	set_entry_data(temp);
+	temp->next = *begin;
+	*begin = temp;
+}
+
+void insert_at_back(Entry **begin)
+{
+	Entry *new = malloc(sizeof(Entry));
+	strncpy(new->name, "[undefined]", NAME_LEN);
+	strncpy(new->phonenumber, "[undefined]", PHONENUMBER_LEN);
+	new->year_of_birth = 0;
+	Entry *helper;
+	helper = *begin;
+	if (*begin == NULL)
+		*begin = new;
+	else {
+		while (helper->next != NULL)
+			helper = helper->next;
+		helper->next = new;
+	}
+	set_entry_data(new);
+	new->next = NULL;
+}
+
+void insert_entry(Entry **entry)
+{
+	enum Insert_pos pos = get_insert_pos();
+	char another_entry = 'u';
+	if (pos == AT_FRONT) {
+		do {
+			printf("### Enter Contact\n");
+			insert_at_front(entry);
+			another_entry = enter_another();
+		} while (another_entry != 'n');
+	} else {
+		do {
+			printf("### Enter Contact\n");
+			insert_at_back(entry);
+			another_entry = enter_another();
+		} while (another_entry != 'n');
+	}
+}
+
+void edit_entry(Entry **entry)
+{
+	Entry *edit_this = select_entry(*entry);
+	if (edit_this != NULL) {
+		set_entry_data(edit_this);
+    } else {
+		printf("No matching entry found.\n");
+    }
+}
+
+void exec_opt(char option, Entry **begin)
+{
+	switch (option) {
+		case ADD_NEW_ENTRY:
+			insert_entry(begin);
+			break;
+		case SHOW_ALL_ENTRIES:
+			print_entries(*begin);
+			break;
+		case EDIT_ENTRY:
+			edit_entry(begin);
+			break;
+		case SAVE_AND_QUIT:
+			write_all_to_file(*begin);
+			break;
+	}
 }

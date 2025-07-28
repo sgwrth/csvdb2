@@ -10,7 +10,8 @@ OBJFILES = \
 	$(BUILDDIR)/menu.o \
 	$(BUILDDIR)/entry.o \
 	$(BUILDDIR)/file.o \
-	$(BUILDDIR)/csv.o
+	$(BUILDDIR)/csv.o \
+	$(BUILDDIR)/output.o
 
 $(BUILDDIR)/phonebook: $(OBJFILES)
 	$(CC) $(CFLAGS) -o $(BUILDDIR)/phonebook $(OBJFILES)
@@ -38,6 +39,9 @@ $(BUILDDIR)/file.o: $(SRCDIR)/core/file.c
 
 $(BUILDDIR)/csv.o: $(SRCDIR)/utils/csv.c
 	$(CC) $(CFLAGS) -c $(SRCDIR)/utils/csv.c -o $(BUILDDIR)/csv.o
+
+$(BUILDDIR)/output.o: $(SRCDIR)/app/output.c
+	$(CC) $(CFLAGS) -c $(SRCDIR)/app/output.c -o $(BUILDDIR)/output.o
 
 clean:
 	rm $(BUILDDIR)/phonebook $(BUILDDIR)/*.o

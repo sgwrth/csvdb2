@@ -54,3 +54,27 @@ char *get_filename()
 	clr_buf(stdin);
 	return filename;
 }
+
+enum Insert_pos get_insert_pos()
+{
+	char pos;
+	do {
+		printf("Insert at [f]ront or [b]ack?  Please enter: ");
+		scanf("%c", &pos);
+		clr_buf(stdin);
+	} while (pos != 'f' && pos != 'b');
+	if (pos == 'f')
+		return AT_FRONT;
+	return AT_BACK;
+}
+
+char enter_another()
+{
+	char another_entry;
+	do {
+		printf("Do you want to add another entry?  [Y]es or [n]o: ");
+		scanf("%c", &another_entry);
+		clr_buf(stdin);
+	} while (another_entry != 'y' && another_entry != 'n');
+	return another_entry;
+}
