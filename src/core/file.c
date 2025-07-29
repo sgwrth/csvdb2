@@ -7,11 +7,11 @@
 #include <string.h>
 #include "./file.h"
 
-void write_to_file(Entry *entry)
+void write_to_file(Entry *entry, char *filename)
 {
 	Entry *selected = select_entry(entry);
 	if (selected != NULL) {
-		FILE *fp = fopen(get_filename(), "a");
+		FILE *fp = fopen(get_filename(filename), "a");
 		fprintf(fp, "\"%s\"", selected->name);
 		fprintf(fp, ",");
 		fprintf(fp, "\"%s\"", selected->phonenumber);
@@ -23,11 +23,11 @@ void write_to_file(Entry *entry)
 		printf("No matching entry found.\n");
 }
 
-void write_all_to_file(Entry *entry)
+void write_all_to_file(Entry *entry, char *filename)
 {
 	Entry *selected = entry;
 	if (selected != NULL) {
-		FILE *fp = fopen(get_filename(), "w");
+		FILE *fp = fopen(get_filename(filename), "w");
 		do {
 			fprintf(fp, "\"%s\"", selected->name);
 			fprintf(fp, ",");
@@ -41,9 +41,10 @@ void write_all_to_file(Entry *entry)
 	}
 }
 
-FILE *open_file()
+FILE *open_file(char **filename)
 {	
-	FILE *fp = fopen(get_filename(), "r");
+    *filename = get_filename(*filename);
+	FILE *fp = fopen(*filename, "r");
 	while (fp == NULL) {
 		printf("error: file not found\n");
 		char try_again_or_quit = UNDEFINED;
@@ -62,14 +63,14 @@ FILE *open_file()
         } else if (try_again_or_quit == QUIT) {
 			exit(0);
         }
-		fp = fopen(get_filename(), "r");
+		fp = fopen(get_filename(*filename), "r");
 	}
 	return fp;
 }
 
-int read_from_file(Entry **begin)
+int read_from_file(char** filename, Entry **begin)
 {
-	FILE *fp = open_file();
+	FILE *fp = open_file(filename);
 	if (fp == NULL) {
 		return 0;
     }

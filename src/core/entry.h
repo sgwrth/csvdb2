@@ -23,6 +23,6 @@ void insert_at_front(Entry**);
 void insert_at_back(Entry**);
 void insert_entry(Entry**);
 void edit_entry(Entry**);
-void exec_opt(char, Entry**);
+void exec_opt(char, Entry**, char*);
 
 #endif

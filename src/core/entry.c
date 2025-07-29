@@ -173,7 +173,7 @@ void edit_entry(Entry **entry)
     }
 }
 
-void exec_opt(char option, Entry **begin)
+void exec_opt(char option, Entry **begin, char *filename)
 {
 	switch (option) {
 		case ADD_NEW_ENTRY:
@@ -186,7 +186,7 @@ void exec_opt(char option, Entry **begin)
 			edit_entry(begin);
 			break;
 		case SAVE_AND_QUIT:
-			write_all_to_file(*begin);
+			write_all_to_file(*begin, filename);
 			break;
 	}
 }

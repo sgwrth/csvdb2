@@ -4,6 +4,7 @@
 #include "../app/menu.h"
 #include "../enums/enums.h"
 #include "../core/entry.h"
+#include "../const/constants.h"
 #include "../utils/buf.h"
 #include "./input.h"
 
@@ -46,12 +47,27 @@ char ask_if_enter_new_val(char *name_of_val)
 	} while (edit_yes_no != 'y' && edit_yes_no != 'n');
 }
 
-char *get_filename()
+char *get_filename(char *filename)
 {
-	char *filename = malloc(12);
-	printf("Enter filename (max. 12 characters): ");
-	scanf("%s", filename);
-	clr_buf(stdin);
+    if (filename == NULL) {
+        filename = malloc(MAX_FILENAME_LEN);
+        printf("Enter filename (max. %d characters): ", MAX_FILENAME_LEN);
+        scanf("%s", filename);
+        clr_buf(stdin);
+    } else {
+        printf("Current filename: %s\n", filename);
+        printf("Keep it?  [Y]es or [n]o: \n");
+        char keep_filename;
+        scanf("%c", &keep_filename);
+        clr_buf(stdin);
+        if (keep_filename == 'y') {
+            return filename;
+        }
+        printf("Enter filename (max. %d characters): ", MAX_FILENAME_LEN);
+        scanf("%s", filename);
+        clr_buf(stdin);
+    }
+	// char *filename = malloc(MAX_FILENAME_LEN);
 	return filename;
 }
 
