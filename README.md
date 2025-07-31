@@ -1,10 +1,18 @@
-CLI-based 'database'.  Let's you create a list of your favourite female movie characters and saves the data to a .csv file.
+CLI-based phonebook app.  Create, view, and edit contacts with name, phone number, and year of birth.  Contacts are saved to a .csv file.
 
-Includes:
-- creating, editing and deleting list entries
-- saving data to .csv file
-- reading data from .csv file on programm start or creating new list
+- uses linked list as its main data structure
+- saves contacts to a .csv file
+- reads .csv file and generates linked list of contacts from it
+- search for contacts by name
+
+To do:
+
+- option to delete contacts
+- encrypt data with with basic, handrolled algorithm like Caesar's Cipher
+- replace year of birth with birthday
+- use ncurses for TUI
 
 Screenshot:
 
-![csvdb2](https://github.com/sgwrth/csvdb2/assets/32227964/0e301359-5955-4ae7-91d7-c25a6331ac9a)
+<img width="813" height="801" alt="phonebook" src="https://github.com/user-attachments/assets/f575e785-da89-4617-ab0a-e5a46ed1bfdc" />
+
