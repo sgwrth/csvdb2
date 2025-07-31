@@ -25,4 +25,14 @@ enum Insert_pos {
 	AT_BACK = 'b'
 };
 
+enum Yes_no {
+    YES = 'y',
+    NO = 'n'
+};
+
+enum Csv_symbols {
+    COMMA = ',',
+    QUOTES = '"'
+};
+
 #endif

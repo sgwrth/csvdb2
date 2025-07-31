@@ -12,11 +12,10 @@ int main()
 	if (open_or_new_db == OPEN) {
 		read_from_file(&filename, &begin);
     }
-    printf("%s\n", filename);
 	char option;
 	do {
 		option = pick_opt(&begin);
 		exec_opt(option, &begin, filename);
-	} while (option != SAVE_AND_QUIT );
+	} while (option != SAVE_AND_QUIT);
 	return 0;
 }

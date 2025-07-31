@@ -1,11 +1,12 @@
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
 #include "../app/menu.h"
+#include "../app/messages.h"
 #include "../enums/enums.h"
 #include "../core/entry.h"
 #include "../const/constants.h"
 #include "../utils/buf.h"
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 #include "./input.h"
 
 char pick_opt(Entry **begin)
@@ -40,34 +41,33 @@ char ask_if_enter_new_val(char *name_of_val)
 {
     char edit_yes_no;
 	do {
-		printf("Do you want to enter a new %s?  [Y]es or [n]o: ", name_of_val);
+		printf(ENTER_NEW_PCT_S, name_of_val);
 		scanf("%c", &edit_yes_no);
 		clr_buf(stdin);
         return edit_yes_no;
-	} while (edit_yes_no != 'y' && edit_yes_no != 'n');
+	} while (edit_yes_no != YES && edit_yes_no != NO);
 }
 
 char *get_filename(char *filename)
 {
     if (filename == NULL) {
         filename = malloc(MAX_FILENAME_LEN);
-        printf("Enter filename (max. %d characters): ", MAX_FILENAME_LEN);
+        printf(ENTER_FILENAME_PCT_D, MAX_FILENAME_LEN);
         scanf("%s", filename);
         clr_buf(stdin);
     } else {
-        printf("Current filename: %s\n", filename);
-        printf("Keep it?  [Y]es or [n]o: \n");
+        printf(CURRENT_FILENAME, filename);
+        printf(KEEP_IT_YES_NO);
         char keep_filename;
         scanf("%c", &keep_filename);
         clr_buf(stdin);
-        if (keep_filename == 'y') {
+        if (keep_filename == YES) {
             return filename;
         }
-        printf("Enter filename (max. %d characters): ", MAX_FILENAME_LEN);
+        printf(ENTER_FILENAME_PCT_D, MAX_FILENAME_LEN);
         scanf("%s", filename);
         clr_buf(stdin);
     }
-	// char *filename = malloc(MAX_FILENAME_LEN);
 	return filename;
 }
 
@@ -75,11 +75,11 @@ enum Insert_pos get_insert_pos()
 {
 	char pos;
 	do {
-		printf("Insert at [f]ront or [b]ack?  Please enter: ");
+		printf(INSERT_BACK_FRONT);
 		scanf("%c", &pos);
 		clr_buf(stdin);
-	} while (pos != 'f' && pos != 'b');
-	if (pos == 'f')
+	} while (pos != AT_FRONT && pos != AT_BACK);
+	if (pos == AT_FRONT)
 		return AT_FRONT;
 	return AT_BACK;
 }
@@ -88,9 +88,9 @@ char enter_another()
 {
 	char another_entry;
 	do {
-		printf("Do you want to add another entry?  [Y]es or [n]o: ");
+		printf(ADD_ANOTHER_YES_NO);
 		scanf("%c", &another_entry);
 		clr_buf(stdin);
-	} while (another_entry != 'y' && another_entry != 'n');
+	} while (another_entry != YES && another_entry != NO);
 	return another_entry;
 }

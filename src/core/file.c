@@ -1,5 +1,16 @@
-#include "../core/entry.h"
+/*
+ * If this include is not put first, the compiler will give
+ * an 'implicit declaration' warning for get_filename().
+ * However, this results in the compiler giving said warning
+ * for print_file_not_found_menu().  The workaround here is
+ * to use this forward declaration.
+ */
 #include "../core/input.h"
+void print_file_not_found_menu();
+
+#include "../app/menu.h"
+#include "../app/messages.h"
+#include "../core/entry.h"
 #include "../utils/buf.h"
 #include "../utils/csv.h"
 #include <stdio.h>
@@ -7,11 +18,12 @@
 #include <string.h>
 #include "./file.h"
 
+
 void write_to_file(Entry *entry, char *filename)
 {
 	Entry *selected = select_entry(entry);
 	if (selected != NULL) {
-		FILE *fp = fopen(get_filename(filename), "a");
+        FILE *fp = fopen(get_filename(filename), "a");
 		fprintf(fp, "\"%s\"", selected->name);
 		fprintf(fp, ",");
 		fprintf(fp, "\"%s\"", selected->phonenumber);
@@ -20,7 +32,7 @@ void write_to_file(Entry *entry, char *filename)
 		fprintf(fp, "\n");
 		fclose(fp);
 	} else
-		printf("No matching entry found.\n");
+		printf(NO_MATCH_FOUND);
 }
 
 void write_all_to_file(Entry *entry, char *filename)
@@ -46,21 +58,21 @@ FILE *open_file(char **filename)
     *filename = get_filename(*filename);
 	FILE *fp = fopen(*filename, "r");
 	while (fp == NULL) {
-		printf("error: file not found\n");
+		printf(NO_FILE_FOUND);
 		char try_again_or_quit = UNDEFINED;
 		while (try_again_or_quit != TRY_AGAIN
 				&& try_again_or_quit != CREATE_NEW
-				&& try_again_or_quit != QUIT) {
-			printf("[T]ry again\n"),
-			printf("[C]reate a new db\n");
-			printf("[Q]uit the program?\n");
+				&& try_again_or_quit != QUIT
+        ) {
+            print_file_not_found_menu();
 			printf("Enter: ");
 			scanf("%c", &try_again_or_quit);
 			clr_buf(stdin);
 		}
 		if (try_again_or_quit == CREATE_NEW) {
 			return NULL;
-        } else if (try_again_or_quit == QUIT) {
+        }
+        if (try_again_or_quit == QUIT) {
 			exit(0);
         }
 		fp = fopen(get_filename(*filename), "r");
@@ -68,7 +80,7 @@ FILE *open_file(char **filename)
 	return fp;
 }
 
-int read_from_file(char** filename, Entry **begin)
+int read_from_file(char **filename, Entry **begin)
 {
 	FILE *fp = open_file(filename);
 	if (fp == NULL) {
@@ -81,7 +93,6 @@ int read_from_file(char** filename, Entry **begin)
 		csv_as_single_str[i] = ch;
 		i++;
 	}
-	printf("%s", csv_as_single_str);
 
 	int m = 0;
 	do {
